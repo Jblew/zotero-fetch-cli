@@ -1,7 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
 import {
-  deleteFile,
   downloadZoteroAttachment,
   ensureDirectoryExists,
   getFromZoteroAllPages,
@@ -9,6 +8,7 @@ import {
 
 type ZoteroItem = {
   key: string;
+  data: { extra?: string };
   links: { attachment?: { href?: string } };
 } & Record<string, any>;
 
@@ -58,12 +58,27 @@ function writeVersion(versionFilePath: string, version: number) {
 }
 
 function getItemPath(item: ZoteroItem, dir: string): string {
-  const filename = `${item.key}.pdf`;
+  let filename = item.key;
+  const citationKey = getCitationKeyOfZoteroItem(item);
+  if (citationKey) filename += `_${citationKey}`;
+  filename += ".pdf";
   return path.resolve(dir, filename);
 }
 
 async function downloadItem(item: ZoteroItem, path: string) {
   if (item.links.attachment?.href) {
     return downloadZoteroAttachment(`${item.links.attachment.href}/file`, path);
+  }
+}
+
+function getCitationKeyOfZoteroItem(item: ZoteroItem): string | undefined {
+  if (!item.data.extra) return;
+  const lines = item.data.extra.split("\n").map((l) => l.trim());
+  const kv = lines
+    .map((l) => l.split(":", 2))
+    .map((kv) => [kv[0].trim().toLowerCase(), kv[1].trim()]);
+  const citationPair = kv.filter((kv) => kv[0] == "citation key");
+  if (citationPair.length > 0) {
+    return citationPair[0][1];
   }
 }
