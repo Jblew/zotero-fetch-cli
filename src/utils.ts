@@ -54,17 +54,17 @@ export async function ensureDirectoryExists(path: string) {
 }
 
 export async function downloadZoteroAttachment(
-  itemKey: string,
+  url: string,
   outputLocationPath: string
 ) {
   const key = ZOTERO_APIKEY;
-  const userid = ZOTERO_USERID;
-  const fileUrl = `https://api.zotero.org/users/${userid}/items/${itemKey}/file`;
   const writer = fs.createWriteStream(outputLocationPath);
+
+  console.log(`Downloading attachment from ${url}`);
 
   return Axios({
     method: "get",
-    url: fileUrl,
+    url,
     headers: {
       "Zotero-API-Version": "3",
       "Zotero-API-Key": key,

@@ -7,7 +7,10 @@ import {
   getFromZoteroAllPages,
 } from "./utils";
 
-type ZoteroItem = { key: string } & Record<string, any>;
+type ZoteroItem = {
+  key: string;
+  links: { attachment?: { href?: string } };
+} & Record<string, any>;
 
 export async function fetchModifiedAttachments({ dir }: { dir: string }) {
   ensureDirectoryExists(dir);
@@ -18,12 +21,8 @@ export async function fetchModifiedAttachments({ dir }: { dir: string }) {
     currentVersion,
     "items"
   );
-  const deleted = await getModifiedSince(currentVersion, "items");
   for (const item of modifiedItems) {
     await downloadItem(item, getItemPath(item, dir));
-  }
-  for (const item of deleted.modifiedItems) {
-    await deleteFile(getItemPath(item, dir));
   }
 
   await writeVersion(versionFilePath, newVersion);
@@ -31,11 +30,8 @@ export async function fetchModifiedAttachments({ dir }: { dir: string }) {
 
 async function getModifiedSince(
   version: number | undefined,
-  kind: "items" | "deleted"
+  kind: "items"
 ): Promise<{ modifiedItems: ZoteroItem[]; newVersion: number }> {
-  if (!version && kind === "deleted") {
-    return { modifiedItems: [], newVersion: 0 };
-  }
   const url =
     `${kind}?format=json&limit=100` + (version ? `&since=${version}` : "");
   const { pages, headers } = await getFromZoteroAllPages<ZoteroItem>(url);
@@ -67,5 +63,7 @@ function getItemPath(item: ZoteroItem, dir: string): string {
 }
 
 async function downloadItem(item: ZoteroItem, path: string) {
-  return downloadZoteroAttachment(item.key, path);
+  if (item.links.attachment?.href) {
+    return downloadZoteroAttachment(`${item.links.attachment.href}/file`, path);
+  }
 }
