@@ -1,6 +1,6 @@
 {
   "name": "zotero-fetch-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fetch bibliography, Fetch PDFs, Sync PDFs. Best served with CICD.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
