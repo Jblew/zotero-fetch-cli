@@ -1,0 +1,57 @@
+{
+  "name": "zotero-fetch-cli",
+  "version": "1.0.0",
+  "description": "Fetch bibliography, Fetch PDFs, Sync PDFs. Best served with CICD.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/dist",
+    "package-lock.js"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' nyc --exclude \"**/*.spec.ts\" --reporter=text --reporter=json-summary mocha --require ts-node/register \"src/**/*.spec.ts\"",
+    "release:semantic": "semantic-release --no-ci -d false",
+    "release:commitversion": "git add package* && git commit -m \"chore: bump version\" && git push origin main",
+    "release": "npm run build && npm run test && npm run release:semantic && npm run release:commitversion"
+  },
+  "dependencies": {
+    "@types/parse-link-header": "^1.0.1",
+    "axios": "^0.24.0",
+    "parse-link-header": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^16.7.6",
+    "semantic-release": "^17.4.7",
+    "ts-node": "^10.2.1",
+    "tsconfig-paths": "^3.11.0",
+    "typescript": "^4.3.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jblew/zotero-fetch-cli.git"
+  },
+  "author": "Jędrzej B Lewandowski <jedrzejblew@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jblew/zotero-fetch-cli/issues"
+  },
+  "homepage": "https://github.com/Jblew/zotero-fetch-cli#readme",
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm"
+    ]
+  }
+}
