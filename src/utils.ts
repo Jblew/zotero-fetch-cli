@@ -8,43 +8,40 @@ const ZOTERO_USERID: string = process.env.ZOTERO_USERID as string;
 if (!ZOTERO_USERID) throw new Error("Missing env ZOTERO_USERID");
 
 export async function getArrayFromZotero(apiUrl: string) {
-  const userid = ZOTERO_USERID;
-  let url:
-    | string
-    | undefined = `https://api.zotero.org/users/${userid}/${apiUrl}`;
-  let out = [];
-
-  while (url) {
-    const resp = await getFromZoteroRaw(url);
-    out.push(...resp.data);
-
-    const nextUrl = getNextUrlFromZoteroResponseHeaders(resp.headers);
-    if (nextUrl) url = nextUrl;
-    else url = undefined;
-  }
-  return out;
+  const { pages } = await getFromZoteroAllPages(apiUrl);
+  return pages.flat();
 }
 
 export async function getStringFromZotero(apiUrl: string) {
-  const userid = ZOTERO_USERID;
-  let url:
-    | string
-    | undefined = `https://api.zotero.org/users/${userid}/${apiUrl}`;
-  let out = "";
+  const { pages } = await getFromZoteroAllPages(apiUrl);
+  return pages.join("");
+}
+
+export async function getFromZoteroAllPages<T>(apiUrl: string): Promise<{
+  pages: T[];
+  headers: Array<Record<string, string>>;
+}> {
+  let url: string | undefined = getZoteroFullUrl(apiUrl);
+  const pages: T[] = [];
+  const headers: Array<Record<string, string>> = [];
 
   while (url) {
     const resp = await getFromZoteroRaw(url);
-    out += resp.data;
+    pages.push(resp.data);
+    headers.push(resp.headers);
 
     const nextUrl = getNextUrlFromZoteroResponseHeaders(resp.headers);
-    if (nextUrl) url = nextUrl;
-    else url = undefined;
+    url = nextUrl || undefined;
   }
-  return out;
+  return { pages, headers };
 }
 
 export async function writeToFile(path: string, data: any) {
   return fs.writeFileSync(path, data.toString());
+}
+
+export async function deleteFile(path: string) {
+  return fs.unlinkSync(path);
 }
 
 export async function ensureDirectoryExists(path: string) {
@@ -54,6 +51,51 @@ export async function ensureDirectoryExists(path: string) {
   if (!fs.lstatSync(path).isDirectory()) {
     throw new Error(`${path} is not a directory`);
   }
+}
+
+export async function downloadZoteroAttachment(
+  itemKey: string,
+  outputLocationPath: string
+) {
+  const key = ZOTERO_APIKEY;
+  const userid = ZOTERO_USERID;
+  const fileUrl = `https://api.zotero.org/users/${userid}/items/${itemKey}/file`;
+  const writer = fs.createWriteStream(outputLocationPath);
+
+  return Axios({
+    method: "get",
+    url: fileUrl,
+    headers: {
+      "Zotero-API-Version": "3",
+      "Zotero-API-Key": key,
+    },
+    responseType: "stream",
+  }).then((response) => {
+    //ensure that the user can call `then()` only when the file has
+    //been downloaded entirely.
+
+    return new Promise((resolve, reject) => {
+      response.data.pipe(writer);
+      let error: any = null;
+      writer.on("error", (err) => {
+        error = err;
+        writer.close();
+        reject(err);
+      });
+      writer.on("close", () => {
+        if (!error) {
+          resolve(true);
+        }
+        //no need to call the reject here, as it will have been called in the
+        //'error' stream;
+      });
+    });
+  });
+}
+
+function getZoteroFullUrl(apiUrl: string) {
+  const userid = ZOTERO_USERID;
+  return `https://api.zotero.org/users/${userid}/${apiUrl}`;
 }
 
 async function getFromZoteroRaw(url: string) {

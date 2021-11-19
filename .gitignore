@@ -2,5 +2,7 @@ node_modules
 .DS_Store
 /dist
 /test.sh
+/test-attachments.sh
+/test-dir/
 /test-bibliography.json
 /test-bibliography.bib
