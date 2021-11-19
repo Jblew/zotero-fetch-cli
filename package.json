@@ -4,6 +4,7 @@
   "description": "Fetch bibliography, Fetch PDFs, Sync PDFs. Best served with CICD.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": "dist/index.js",
   "engines": {
     "node": ">=8"
   },
@@ -15,19 +16,20 @@
     "package-lock.js"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm i -g",
     "release:semantic": "semantic-release --no-ci -d false",
     "release:commitversion": "git add package* && git commit -m \"chore: bump version\" && git push origin main",
-    "release": "npm run build && npm run test && npm run release:semantic && npm run release:commitversion"
+    "release": "npm run build && npm run release:semantic && npm run release:commitversion"
   },
   "dependencies": {
-    "@types/parse-link-header": "^1.0.1",
     "axios": "^0.24.0",
+    "commander": "^8.3.0",
     "parse-link-header": "^1.0.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/node": "^16.7.6",
+    "@types/parse-link-header": "^1.0.1",
     "semantic-release": "^17.4.7",
     "ts-node": "^10.2.1",
     "tsconfig-paths": "^3.11.0",
