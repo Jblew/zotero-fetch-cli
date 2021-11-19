@@ -16,7 +16,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' nyc --exclude \"**/*.spec.ts\" --reporter=text --reporter=json-summary mocha --require ts-node/register \"src/**/*.spec.ts\"",
     "release:semantic": "semantic-release --no-ci -d false",
     "release:commitversion": "git add package* && git commit -m \"chore: bump version\" && git push origin main",
     "release": "npm run build && npm run test && npm run release:semantic && npm run release:commitversion"
