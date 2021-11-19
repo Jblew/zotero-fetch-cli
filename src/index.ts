@@ -5,16 +5,13 @@ import { fetchBibliographyToFile } from "./fetch-bibliography";
 const program = new Command();
 
 program
-  .command("fetch-bibliography <destination>")
+  .command("bibliography <destination>")
   .requiredOption("--format <json|bibtex>", "json|bibtex")
   .description("Fetches entire user bibliography to json or bibtex")
   .action(async (destination, options) => {
-    console.log({
-      destination,
-      options,
-    });
     try {
       await fetchBibliographyToFile({ destination, format: options.format });
+      console.log(`Written to ${destination}`);
     } catch (err) {
       console.error(err);
       process.exit(1);

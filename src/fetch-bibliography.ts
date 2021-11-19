@@ -11,14 +11,11 @@ export async function fetchBibliographyToFile({
 }) {
   if (format === "json") {
     const items = await getArrayFromZotero("items?format=json&limit=50");
-    console.log(items);
     await writeToFile(destination, JSON.stringify(items, undefined, 2));
   } else if (format === "bibtex") {
     const bibtex = await getStringFromZotero("items?format=bibtex&limit=50");
-    console.log(bibtex);
     await writeToFile(destination, bibtex);
   } else {
     throw new Error(`Unknown format ${format}`);
   }
-  console.log("Done");
 }

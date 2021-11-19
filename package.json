@@ -4,7 +4,9 @@
   "description": "Fetch bibliography, Fetch PDFs, Sync PDFs. Best served with CICD.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/index.js",
+  "bin": {
+    "zotero-fetch": "dist/index.js"
+  },
   "engines": {
     "node": ">=8"
   },

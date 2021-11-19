@@ -19,7 +19,6 @@ export async function getArrayFromZotero(apiUrl: string) {
     out.push(...resp.data);
 
     const nextUrl = getNextUrlFromZoteroResponseHeaders(resp.headers);
-    console.log({ apiUrl, headers: resp.headers, nextUrl });
     if (nextUrl) url = nextUrl;
     else url = undefined;
   }
@@ -38,7 +37,6 @@ export async function getStringFromZotero(apiUrl: string) {
     out += resp.data;
 
     const nextUrl = getNextUrlFromZoteroResponseHeaders(resp.headers);
-    console.log({ apiUrl, headers: resp.headers, nextUrl });
     if (nextUrl) url = nextUrl;
     else url = undefined;
   }
