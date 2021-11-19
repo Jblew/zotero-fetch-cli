@@ -26,6 +26,7 @@ export async function fetchModifiedAttachments({ dir }: { dir: string }) {
   }
 
   await writeVersion(versionFilePath, newVersion);
+  console.log(`Written version '${newVersion}' to ${versionFilePath}`);
 }
 
 async function getModifiedSince(
