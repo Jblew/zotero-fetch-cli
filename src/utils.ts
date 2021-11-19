@@ -60,7 +60,7 @@ export async function downloadZoteroAttachment(
   const key = ZOTERO_APIKEY;
   const writer = fs.createWriteStream(outputLocationPath);
 
-  console.log(`Downloading attachment from ${url}`);
+  console.log(`Downloading attachment from ${url} to ${outputLocationPath}`);
 
   return Axios({
     method: "get",
