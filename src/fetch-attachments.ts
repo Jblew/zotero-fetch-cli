@@ -45,7 +45,7 @@ async function getModifiedSince(
 }
 
 function getVersionFilePath(dir: string) {
-  return path.join(dir, ".version");
+  return path.join(dir, "version");
 }
 
 function getVersion(versionFilePath: string): number | undefined {
