@@ -47,6 +47,15 @@ export async function writeToFile(path: string, data: any) {
   return fs.writeFileSync(path, data.toString());
 }
 
+export async function ensureDirectoryExists(path: string) {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path);
+  }
+  if (!fs.lstatSync(path).isDirectory()) {
+    throw new Error(`${path} is not a directory`);
+  }
+}
+
 async function getFromZoteroRaw(url: string) {
   const key = ZOTERO_APIKEY;
   const resp = await Axios({
